@@ -5,30 +5,11 @@
 // #include "Poco/DigestStream.h"
 #include "sensor.pb.h"
 #include <google/protobuf/util/json_util.h>
-
-class Data {
-  public:
-    int foo;
-    int bar;
-}
-
-class Hoge {
-  public:
-    Hoge();
-    ~Hoge();
-};
-
-Hoge::Hoge() {
-  std::cout << "Hoge created " << this << std::endl;
-}
-
-Hoge::~Hoge() {
-  std::cout << "Hoge destructed " << this << std::endl;
-}
+#include "out/httplib.h"
 
 Foo build_foo() {
   auto foo = Foo();
-  foo.set_bar("Default Bar");
+  foo.set_bar("Hello world");
   return foo;
 }
 
@@ -51,20 +32,18 @@ Sensor build_sensor() {
   return sensor;
 }
 
-int main() {
-  Data dt{1, 2};
-  dt.bar = 100;
-  std::cout << "begin app" << dt.foo << std::endl;
-  std::cout << "Foo default instance " << &_Foo_default_instance_ << std::endl;
+int main(int argc, char* argv[]) {
+  // std::cout << "begin app" << dt.foo << std::endl;
+  // std::cout << "Foo default instance " << &_Foo_default_instance_ << std::endl;
   // Poco::MD5Engine md5;
   // Poco::DigestOutputStream ds(md5);
   // ds << "abcdefghijklmnopqrstuvwxyz";
   // ds.close();
   // std::cout << Poco::DigestEngine::digestToHex(md5.digest()) << std::endl;
 
-  auto sensor = build_sensor();
-  std::ofstream ofs("sensor.data", std::ios_base::out | std::ios_base::binary);
-  sensor.SerializeToOstream(&ofs);
+  // auto sensor = build_sensor();
+  // std::ofstream ofs("sensor.data", std::ios_base::out | std::ios_base::binary);
+  // sensor.SerializeToOstream(&ofs);
   // sensor.release_foo();
   // ofs.flush();
 
@@ -77,4 +56,27 @@ int main() {
   // std::cout << str << std::endl;
   // // google::protobuf::ShutdownProtobufLibrary();
   // std::cout << "After shutdown" << std::endl;
+  auto host = "localhost";
+  auto port = 8080;
+  if (argc == 1) {
+    httplib::Server svr;
+
+    svr.Get("/foo", [](const httplib::Request &req, httplib::Response &res) {
+      Foo foo = build_foo();
+      std::string str;
+      google::protobuf::util::MessageToJsonString(foo, &str);
+      res.set_content(str, "application/json");
+    });
+    std::cout << "Server mode: listening at port " << port << std::endl;
+    svr.listen(host, port);
+    return 0;
+  }
+  httplib::Client cli(host, port);
+  auto res = cli.Get("/foo");
+  if (res && res->status == 200) {
+    Foo out;
+    google::protobuf::util::JsonStringToMessage(res->body, &out);
+    std::cout << out.bar() << std::endl;
+  }
+  return 0;
 }

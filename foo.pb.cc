@@ -103,7 +103,6 @@ Foo::Foo(const Foo& from)
 }
 
 void Foo::SharedCtor() {
-  std::cout << "Foo created " << this << std::endl;
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_Foo_foo_2eproto.base);
   bar_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
@@ -114,7 +113,6 @@ Foo::~Foo() {
 }
 
 void Foo::SharedDtor() {
-  std::cout << "Foo destructed " << this << std::endl;
   bar_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 

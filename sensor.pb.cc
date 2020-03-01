@@ -184,7 +184,6 @@ Sensor::~Sensor() {
 
 void Sensor::SharedDtor() {
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  std::cout << "Sensor delete foo " << (this != internal_default_instance()) << std::endl;
   if (this != internal_default_instance()) delete foo_;
 }
 

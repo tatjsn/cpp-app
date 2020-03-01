@@ -72,7 +72,6 @@ class Foo :
   Foo(const Foo& from);
   Foo(Foo&& from) noexcept
     : Foo() {
-    std::cout << "Move constr called" << std::endl;
     *this = ::std::move(from);
   }
 
@@ -81,7 +80,6 @@ class Foo :
     return *this;
   }
   inline Foo& operator=(Foo&& from) noexcept {
-    std::cout << "Move happened" << std::endl;
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
