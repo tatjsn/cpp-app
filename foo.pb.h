@@ -177,6 +177,7 @@ class Foo :
 
   enum : int {
     kBarFieldNumber = 1,
+    kBazFieldNumber = 2,
   };
   // required string bar = 1;
   bool has_bar() const;
@@ -198,14 +199,31 @@ class Foo :
   std::string* _internal_mutable_bar();
   public:
 
+  // required int32 baz = 2;
+  bool has_baz() const;
+  private:
+  bool _internal_has_baz() const;
+  public:
+  void clear_baz();
+  ::PROTOBUF_NAMESPACE_ID::int32 baz() const;
+  void set_baz(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_baz() const;
+  void _internal_set_baz(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Foo)
  private:
   class _Internal;
+
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
 
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr bar_;
+  ::PROTOBUF_NAMESPACE_ID::int32 baz_;
   friend struct ::TableStruct_foo_2eproto;
 };
 // ===================================================================
@@ -288,6 +306,34 @@ inline void Foo::set_allocated_bar(std::string* bar) {
   }
   bar_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), bar);
   // @@protoc_insertion_point(field_set_allocated:Foo.bar)
+}
+
+// required int32 baz = 2;
+inline bool Foo::_internal_has_baz() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool Foo::has_baz() const {
+  return _internal_has_baz();
+}
+inline void Foo::clear_baz() {
+  baz_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Foo::_internal_baz() const {
+  return baz_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 Foo::baz() const {
+  // @@protoc_insertion_point(field_get:Foo.baz)
+  return _internal_baz();
+}
+inline void Foo::_internal_set_baz(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000002u;
+  baz_ = value;
+}
+inline void Foo::set_baz(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_baz(value);
+  // @@protoc_insertion_point(field_set:Foo.baz)
 }
 
 #ifdef __GNUC__

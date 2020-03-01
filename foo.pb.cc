@@ -43,10 +43,12 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_foo_2eproto::offsets[] PROTOBU
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::Foo, bar_),
+  PROTOBUF_FIELD_OFFSET(::Foo, baz_),
   0,
+  1,
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 6, sizeof(::Foo)},
+  { 0, 7, sizeof(::Foo)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -54,7 +56,8 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_foo_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\tfoo.proto\"\022\n\003Foo\022\013\n\003bar\030\001 \002(\t"
+  "\n\tfoo.proto\"\037\n\003Foo\022\013\n\003bar\030\001 \002(\t\022\013\n\003baz\030\002"
+  " \002(\005"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_foo_2eproto_deps[1] = {
 };
@@ -64,7 +67,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_foo
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_foo_2eproto_once;
 static bool descriptor_table_foo_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_foo_2eproto = {
-  &descriptor_table_foo_2eproto_initialized, descriptor_table_protodef_foo_2eproto, "foo.proto", 31,
+  &descriptor_table_foo_2eproto_initialized, descriptor_table_protodef_foo_2eproto, "foo.proto", 44,
   &descriptor_table_foo_2eproto_once, descriptor_table_foo_2eproto_sccs, descriptor_table_foo_2eproto_deps, 1, 0,
   schemas, file_default_instances, TableStruct_foo_2eproto::offsets,
   file_level_metadata_foo_2eproto, 1, file_level_enum_descriptors_foo_2eproto, file_level_service_descriptors_foo_2eproto,
@@ -83,6 +86,9 @@ class Foo::_Internal {
   static void set_has_bar(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
+  static void set_has_baz(HasBits* has_bits) {
+    (*has_bits)[0] |= 2u;
+  }
 };
 
 Foo::Foo()
@@ -99,12 +105,14 @@ Foo::Foo(const Foo& from)
   if (from._internal_has_bar()) {
     bar_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.bar_);
   }
+  baz_ = from.baz_;
   // @@protoc_insertion_point(copy_constructor:Foo)
 }
 
 void Foo::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_Foo_foo_2eproto.base);
   bar_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  baz_ = 0;
 }
 
 Foo::~Foo() {
@@ -135,6 +143,7 @@ void Foo::Clear() {
   if (cached_has_bits & 0x00000001u) {
     bar_.ClearNonDefaultToEmptyNoArena();
   }
+  baz_ = 0;
   _has_bits_.Clear();
   _internal_metadata_.Clear();
 }
@@ -155,6 +164,14 @@ const char* Foo::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::intern
           #ifndef NDEBUG
           ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "Foo.bar");
           #endif  // !NDEBUG
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // required int32 baz = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          _Internal::set_has_baz(&has_bits);
+          baz_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -196,6 +213,12 @@ failure:
         1, this->_internal_bar(), target);
   }
 
+  // required int32 baz = 2;
+  if (cached_has_bits & 0x00000002u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_baz(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target, stream);
@@ -204,15 +227,43 @@ failure:
   return target;
 }
 
+size_t Foo::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:Foo)
+  size_t total_size = 0;
+
+  if (_internal_has_bar()) {
+    // required string bar = 1;
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_bar());
+  }
+
+  if (_internal_has_baz()) {
+    // required int32 baz = 2;
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_baz());
+  }
+
+  return total_size;
+}
 size_t Foo::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:Foo)
   size_t total_size = 0;
 
-  // required string bar = 1;
-  if (_internal_has_bar()) {
+  if (((_has_bits_[0] & 0x00000003) ^ 0x00000003) == 0) {  // All required fields are present.
+    // required string bar = 1;
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_bar());
+
+    // required int32 baz = 2;
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_baz());
+
+  } else {
+    total_size += RequiredFieldsByteSizeFallback();
   }
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -249,9 +300,16 @@ void Foo::MergeFrom(const Foo& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_bar()) {
-    _has_bits_[0] |= 0x00000001u;
-    bar_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.bar_);
+  cached_has_bits = from._has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      _has_bits_[0] |= 0x00000001u;
+      bar_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.bar_);
+    }
+    if (cached_has_bits & 0x00000002u) {
+      baz_ = from.baz_;
+    }
+    _has_bits_[0] |= cached_has_bits;
   }
 }
 
@@ -270,7 +328,7 @@ void Foo::CopyFrom(const Foo& from) {
 }
 
 bool Foo::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
   return true;
 }
 
@@ -280,6 +338,7 @@ void Foo::InternalSwap(Foo* other) {
   swap(_has_bits_[0], other->_has_bits_[0]);
   bar_.Swap(&other->bar_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
+  swap(baz_, other->baz_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata Foo::GetMetadata() const {

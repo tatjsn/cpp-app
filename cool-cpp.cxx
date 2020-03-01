@@ -4,12 +4,13 @@
 // #include "Poco/MD5Engine.h"
 // #include "Poco/DigestStream.h"
 #include "sensor.pb.h"
-#include <google/protobuf/util/json_util.h>
+// #include <google/protobuf/util/json_util.h>
 #include "out/httplib.h"
 
 Foo build_foo() {
   auto foo = Foo();
   foo.set_bar("Hello world");
+  foo.set_baz(9999);
   return foo;
 }
 
@@ -61,22 +62,23 @@ int main(int argc, char* argv[]) {
   if (argc == 1) {
     httplib::Server svr;
 
-    svr.Get("/foo", [](const httplib::Request &req, httplib::Response &res) {
-      Foo foo = build_foo();
-      std::string str;
-      google::protobuf::util::MessageToJsonString(foo, &str);
-      res.set_content(str, "application/json");
+    svr.Get("/foo", [](auto &req, auto &res) {
+      auto foo = build_foo();
+      // std::string str;
+      // google::protobuf::util::MessageToJsonString(foo, &str);
+      res.set_content(foo.SerializeAsString(), "application/protobuf");
     });
     std::cout << "Server mode: listening at port " << port << std::endl;
     svr.listen(host, port);
     return 0;
   }
+
   httplib::Client cli(host, port);
   auto res = cli.Get("/foo");
   if (res && res->status == 200) {
-    Foo out;
-    google::protobuf::util::JsonStringToMessage(res->body, &out);
-    std::cout << out.bar() << std::endl;
+    Foo foo;
+    foo.ParseFromString(res->body);
+    std::cout << foo.bar() << ", " << foo.baz() << std::endl;
   }
   return 0;
 }
