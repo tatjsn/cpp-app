@@ -1,0 +1,6 @@
+syntax = "proto2";
+import "foo.proto";
+
+message FooDto {
+  repeated Foo foos = 1;
+}
