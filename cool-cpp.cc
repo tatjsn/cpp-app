@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <memory>
 #include <sqlite3.h>
 // #include <google/protobuf/util/json_util.h>
@@ -19,7 +20,7 @@ void map_entity_to_foo(const Entity &entity, Foo *fooPtr) {
   fooPtr->set_baz(entity.age);
 }
 
-Entity map_foo_to_entity(Foo foo) {
+Entity map_foo_to_entity(const Foo &foo) {
   return Entity {foo.id(), foo.bar(), foo.baz()};
 }
 
@@ -38,6 +39,7 @@ class Db {
     ~Db();
     std::optional<History> getLastHistory();
     std::list<Entity> getEntities();
+    void addEntity(Entity entity);
 };
 
 Db::Db() {
@@ -94,6 +96,13 @@ std::list<Entity> Db::getEntities() {
   return entities;
 }
 
+void Db::addEntity(Entity entity) {
+  char *err;
+  std::stringstream ss;
+  ss << "insert into entity(name, age) values('" << entity.name << "', " << entity.age <<");";
+  sqlite3_exec(db, ss.str().c_str(), 0, 0, &err);
+}
+
 
 // int main() {
 //   Db db;
@@ -120,17 +129,64 @@ int main(int argc, char* argv[]) {
       }
       res.set_content(dto.SerializeAsString(), "application/protobuf");
     });
+
+    svr.Post("/foo", [&](auto &req, auto &res, auto &content_reader) {
+      std::string body;
+      content_reader([&](const char *data, size_t data_length) {
+        body.append(data, data_length);
+        return true;
+      });
+      FooDto dto;
+      dto.ParseFromString(body);
+
+      for (auto foo : dto.foos()) {
+        auto entity = map_foo_to_entity(foo);
+        db.addEntity(entity);
+      }
+      // TODO: Return id or the whole object
+      res.set_content(dto.DebugString(), "text/plain");
+    });
     std::cout << "Server mode: listening at port " << port << std::endl;
     svr.listen(host, port);
     return 0;
   }
 
   httplib::Client cli(host, port);
-  auto res = cli.Get("/foo");
-  if (res && res->status == 200) {
-    FooDto dto;
-    dto.ParseFromString(res->body);
-    std::cout << dto.DebugString() << std::endl;
+  std::string get = "get";
+  std::string post = "post";
+  std::string dump = "dump";
+
+  if (argc == 2 && get.compare(argv[1]) == 0) {
+    auto res = cli.Get("/foo");
+    if (res && res->status == 200) {
+      FooDto dto;
+      dto.ParseFromString(res->body);
+      std::cout << dto.DebugString() << std::endl;
+    }
+    return 0;
   }
-  return 0;
+
+  if (argc > 3 && post.compare(argv[1]) == 0) {
+    Entity entity {0, argv[2], std::atoi(argv[3])};
+    FooDto dto;
+    auto fooPtr = dto.add_foos();
+    map_entity_to_foo(entity, fooPtr);
+    auto res = cli.Post("/foo", dto.SerializeAsString(), "application/protobuf");
+    if (res && res->status == 200) {
+      std::cout << res->body << std::endl;
+    }
+    return 0;
+  }
+
+  if (argc == 2 && dump.compare(argv[1]) == 0) {
+    Db db;
+    auto entities = db.getEntities();
+    for (auto entity : entities) {
+      std::cout << entity.id << "|" << entity.name << "|" << entity.age << std::endl;
+    }
+    return 0;
+  }
+
+  std::cout << "Unknown command" << std::endl;
+  return 1;
 }
