@@ -39,7 +39,7 @@ class Db {
     ~Db();
     std::optional<History> getLastHistory();
     std::list<Entity> getEntities();
-    void addEntity(Entity &entity);
+    int addEntity(Entity &entity);
 };
 
 Db::Db() {
@@ -96,11 +96,12 @@ std::list<Entity> Db::getEntities() {
   return entities;
 }
 
-void Db::addEntity(Entity &entity) {
+int Db::addEntity(Entity &entity) {
   char *err;
   std::stringstream ss;
   ss << "insert into entity(name, age) values('" << entity.name << "', " << entity.age <<");";
   sqlite3_exec(db, ss.str().c_str(), 0, 0, &err);
+  return sqlite3_last_insert_rowid(db);
 }
 
 int main(int argc, char* argv[]) {
@@ -128,13 +129,18 @@ int main(int argc, char* argv[]) {
       });
       FooDto dto;
       dto.ParseFromString(body);
+      std::list<int> ids;
 
       for (auto foo : dto.foos()) {
         auto entity = map_foo_to_entity(foo);
-        db.addEntity(entity);
+        auto id = db.addEntity(entity);
+        ids.push_back(id);
       }
-      // TODO: Return id or the whole object
-      res.set_content(dto.DebugString(), "text/plain");
+      std::stringstream ss;
+      for (auto id: ids) {
+        ss << "," << id;
+      }
+      res.set_content(&ss.str().c_str()[1], "text/plain");
     });
     std::cout << "Server mode: listening at port " << port << std::endl;
     svr.listen(host, port);
