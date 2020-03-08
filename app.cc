@@ -39,7 +39,7 @@ class Db {
     ~Db();
     std::optional<History> getLastHistory();
     std::list<Entity> getEntities();
-    void addEntity(Entity entity);
+    void addEntity(Entity &entity);
 };
 
 Db::Db() {
@@ -96,22 +96,12 @@ std::list<Entity> Db::getEntities() {
   return entities;
 }
 
-void Db::addEntity(Entity entity) {
+void Db::addEntity(Entity &entity) {
   char *err;
   std::stringstream ss;
   ss << "insert into entity(name, age) values('" << entity.name << "', " << entity.age <<");";
   sqlite3_exec(db, ss.str().c_str(), 0, 0, &err);
 }
-
-
-// int main() {
-//   Db db;
-//   auto entities = db.getEntities();
-//   for (auto entity : entities) {
-//     std::cout << entity.id << entity.name << entity.age << std::endl;
-//   }
-//   return 0;
-// }
 
 int main(int argc, char* argv[]) {
   auto host = "localhost";
