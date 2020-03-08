@@ -3,7 +3,6 @@
 #include <sstream>
 #include <memory>
 #include <sqlite3.h>
-// #include <google/protobuf/util/json_util.h>
 #include "out/foo.pb.h"
 #include "out/foo-dto.pb.h"
 #include "out/httplib.h"
@@ -44,6 +43,9 @@ class Db {
 
 Db::Db() {
   sqlite3_open("deleteme.db", &db);
+  sqlite3_update_hook(db, [](auto self, auto opration, auto _, auto table, auto id) {
+    std::cout << "updated:" << table << ":" << id << std::endl;
+  }, this);
   setup();
 }
 
